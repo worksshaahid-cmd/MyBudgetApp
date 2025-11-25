@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LuxBudget — Premium Budget Tracker</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+        body {
+            background: linear-gradient(160deg,#000,#1a1a1a);
+            color: white;
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            margin-bottom: 0;
+            text-align: center;
+            background: linear-gradient(90deg,#f7d36a,#fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 1.1rem;
+            opacity: 0.8;
+            margin-bottom: 40px;
+        }
+
+        .add-expense {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #f7d36a;
+            border: none;
+            cursor: pointer;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #ffe89c;
+        }
+
+        .list-container ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .list-container li {
+            background: #111;
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #333;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .list-container button {
+            background: red;
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+
+        .summary {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 1.4rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <header>
+        <h1>💎 LuxBudget</h1>
+        <p class="tagline">Track your money in style</p>
+    </header>
+
+    <section class="add-expense">
+        <input id="expense-name" type="text" placeholder="Expense name" />
+        <input id="expense-amount" type="number" placeholder="Amount" />
+        <button onclick="addExpense()">Add</button>
+    </section>
+
+    <section class="list-container">
+        <h2>Your Expenses</h2>
+        <ul id="expense-list"></ul>
+    </section>
+
+    <section class="summary">
+        <h2>Total Spent: <span id="total">0</span> €</h2>
+    </section>
+
+</div>
+
+<script>
+    let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+    function save() {
+        localStorage.setItem("expenses", JSON.stringify(expenses));
+    }
+
+    function render() {
+        const list = document.getElementById("expense-list");
+        const total = document.getElementById("total");
+
+        list.innerHTML = "";
+        let sum = 0;
+
+        expenses.forEach((item, index) => {
+            sum += Number(item.amount);
+
+            const li = document.createElement("li");
+            li.innerHTML = `
+                ${item.name} — <strong>${item.amount} €</strong>
+                <button onclick="deleteExpense(${index})">X</button>
+            `;
+            list.appendChild(li);
+        });
+
+        total.textContent = sum;
+    }
+
+    function addExpense() {
+        const name = document.getElementById("expense-name").value;
+        const amount = document.getElementById("expense-amount").value;
+
+        if (!name || !amount) return alert("Fill in all fields!");
+
+        expenses.push({ name, amount });
+        save();
+        render();
+
+        document.getElementById("expense-name").value = "";
+        document.getElementById("expense-amount").value = "";
+    }
+
+    function deleteExpense(index) {
+        expenses.splice(index, 1);
+        save();
+        render();
+    }
+
+    render();
+</script>
+
+</body>
+</html>
